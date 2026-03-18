@@ -1,31 +1,39 @@
-# Sample vulnerable Flask app
-# Note: intentionally contains security flaws for scanning demo
+# intentionally vulnerable app — for security scanning demo
 
 import sqlite3
 import os
+import subprocess
+import hashlib
 
-# VULNERABILITY 1: Hardcoded secret key
-SECRET_KEY = "hardcoded-secret-abc123"
-AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"
+# VULN 1: Hardcoded credentials (semgrep: generic.secrets)
+password = "supersecret123"
+api_key = "AKIAIOSFODNN7EXAMPLE3"
+db_password = "admin:password123@localhost"
 
-# VULNERABILITY 2: SQL Injection
-def get_user(username):
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    # dangerous: user input directly in query
-    query = "SELECT * FROM users WHERE username = '" + username + "'"
-    cursor.execute(query)
-    return cursor.fetchall()
+# VULN 2: SQL injection (semgrep: python.lang.security.audit.sqli)
+def get_user(user_input):
+    conn = sqlite3.connect("test.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE name = '%s'" % user_input)
+    return cur.fetchall()
 
-# VULNERABILITY 3: Command injection
-def ping_host(host):
-    os.system("ping -c 1 " + host)
+# VULN 3: OS command injection (semgrep: python.lang.security.audit.subprocess)
+def run_command(user_input):
+    os.system("ls " + user_input)
+    subprocess.call("ping " + user_input, shell=True)
 
-# VULNERABILITY 4: Weak comparison
-def check_admin(password):
-    if password == "admin123":
-        return True
-    return False
+# VULN 4: Weak hashing (semgrep: python.lang.security.audit.md5)
+def hash_password(pwd):
+    return hashlib.md5(pwd.encode()).hexdigest()
 
-if __name__ == "__main__":
-    print("app running")
+# VULN 5: Hardcoded AWS key pattern
+AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+```
+
+---
+
+### Fix 2 — Add a custom Semgrep rule we control
+
+Create a new file at this path in your repo:
+```
+.semgrep/rules.yml
