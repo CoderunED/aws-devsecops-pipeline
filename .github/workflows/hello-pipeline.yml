@@ -13,16 +13,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Run Semgrep SAST scan
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: >-
-            p/python
-            p/secrets
-            p/owasp-top-ten
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        continue-on-error: true
+      - name: Install Semgrep
+        run: pip install semgrep
 
-      - name: Confirm scan completed
-        run: echo "Semgrep scan finished"
+      - name: Run Semgrep SAST scan
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/secrets \
+            --config p/owasp-top-ten \
+            --json \
+            --output semgrep-results.json \
+            app/ \
+            || true
+
+      - name: Show findings summary
+        run: |
+          echo "=== SEMGREP FINDINGS ==="
+          python3 -c "
+          import json
+          with open('semgrep-results.json') as f:
+              data = json.load(f)
+          findings = data.get('results', [])
+          print(f'Total findings: {len(findings)}')
+          for f in findings:
+              print(f'  [{f[\"extra\"][\"severity\"]}] {f[\"path\"]}:{f[\"start\"][\"line\"]} - {f[\"check_id\"]}')
+          "
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
