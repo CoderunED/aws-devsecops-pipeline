@@ -1,1 +1,25 @@
 
+rules:
+  - id: hardcoded-password
+    patterns:
+      - pattern: $VAR = "..."
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: .*(password|secret|key|token|pwd).*
+    message: Hardcoded credential found in variable $VAR
+    languages: [python]
+    severity: ERROR
+
+  - id: sql-injection-format
+    patterns:
+      - pattern: $CUR.execute("..." % $INPUT)
+    message: Possible SQL injection via string formatting
+    languages: [python]
+    severity: ERROR
+
+  - id: os-system-injection
+    patterns:
+      - pattern: os.system(...)
+    message: os.system() can lead to command injection
+    languages: [python]
+    severity: WARNING
