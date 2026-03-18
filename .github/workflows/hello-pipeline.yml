@@ -16,32 +16,50 @@ jobs:
       - name: Install Semgrep
         run: pip install semgrep
 
-      - name: Run Semgrep SAST scan
+      - name: Run Semgrep — community rules
         run: |
           semgrep scan \
             --config p/python \
             --config p/secrets \
             --config p/owasp-top-ten \
             --json \
-            --output semgrep-results.json \
-            app/ \
-            || true
+            --output semgrep-community.json \
+            app/ || true
+
+      - name: Run Semgrep — custom rules
+        run: |
+          semgrep scan \
+            --config .semgrep/rules.yml \
+            --json \
+            --output semgrep-custom.json \
+            app/ || true
 
       - name: Show findings summary
         run: |
-          echo "=== SEMGREP FINDINGS ==="
           python3 -c "
           import json
-          with open('semgrep-results.json') as f:
-              data = json.load(f)
-          findings = data.get('results', [])
-          print(f'Total findings: {len(findings)}')
-          for f in findings:
-              print(f'  [{f[\"extra\"][\"severity\"]}] {f[\"path\"]}:{f[\"start\"][\"line\"]} - {f[\"check_id\"]}')
+
+          total = 0
+          for fname in ['semgrep-community.json', 'semgrep-custom.json']:
+              with open(fname) as f:
+                  data = json.load(f)
+              findings = data.get('results', [])
+              total += len(findings)
+              print(f'--- {fname}: {len(findings)} findings ---')
+              for finding in findings:
+                  sev = finding['extra']['severity']
+                  path = finding['path']
+                  line = finding['start']['line']
+                  rule = finding['check_id'].split('.')[-1]
+                  print(f'  [{sev}] {path}:{line} — {rule}')
+
+          print(f'TOTAL FINDINGS: {total}')
           "
 
-      - name: Upload scan results
+      - name: Upload results
         uses: actions/upload-artifact@v4
         with:
           name: semgrep-results
-          path: semgrep-results.json
+          path: |
+            semgrep-community.json
+            semgrep-custom.json
