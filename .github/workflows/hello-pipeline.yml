@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Install Semgrep
         run: pip install semgrep
@@ -34,7 +36,16 @@ jobs:
             --output semgrep-custom.json \
             app/ || true
 
-      - name: Show findings summary
+      - name: Run Trufflehog secret scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ""
+          head: HEAD
+          extra_args: --json --only-verified=false
+        continue-on-error: true
+
+      - name: Show Semgrep findings summary
         run: |
           python3 -c "
           import json
@@ -53,13 +64,13 @@ jobs:
                   rule = finding['check_id'].split('.')[-1]
                   print(f'  [{sev}] {path}:{line} — {rule}')
 
-          print(f'TOTAL FINDINGS: {total}')
+          print(f'TOTAL SEMGREP FINDINGS: {total}')
           "
 
-      - name: Upload results
+      - name: Upload all results
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-results
+          name: security-scan-results
           path: |
             semgrep-community.json
             semgrep-custom.json
