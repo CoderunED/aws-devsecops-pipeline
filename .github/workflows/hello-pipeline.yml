@@ -42,7 +42,7 @@ jobs:
           path: ./
           base: ""
           head: HEAD
-          extra_args: --json --only-verified=false
+          extra_args: --only-verified=false
         continue-on-error: true
 
       - name: Show Semgrep findings summary
