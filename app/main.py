@@ -6,6 +6,7 @@ import subprocess
 import hashlib
 
 # VULN 1: Hardcoded credentials (semgrep: generic.secrets)
+GITHUB_TOKEN = "ghp_fakeTok3nForDemoOnly12345678901"
 password = "supersecret123"
 api_key = "AKIAIOSFODNN7EXAMPLE3"
 db_password = "admin:password123@localhost"
