@@ -40,14 +40,13 @@ Code Push → SAST Scan → Secret Scan → IaC Scan → AI Summary → Gate
 - AWS — target infrastructure (expanding)
 - Claude API — AI-powered findings summary (coming Week 3)
 
-## Current Status
 - [x] GitHub Actions pipeline running
 - [x] Semgrep SAST scanning (community + custom rules)
-- [ ] Trufflehog secret scanning
+- [x] Trufflehog secret scanning
 - [ ] Checkov IaC scanning
 - [ ] AI-powered PR comments
 - [ ] Merge blocking on critical findings
-
+Push → Semgrep (7 findings) → Trufflehog (git history scan) → Results saved
 ## Metrics So Far
 - 7 vulnerabilities detected across 1 file
 - 586 total rules running on every push
