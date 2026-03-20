@@ -108,3 +108,4 @@ jobs:
           path: |
             semgrep-community.json
             semgrep-custom.json
+            checkov-results.json
