@@ -43,6 +43,41 @@ jobs:
           base: ""
           head: HEAD
         continue-on-error: true
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov IaC scan
+        run: |
+          checkov \
+            --directory terraform/ \
+            --output json \
+            --output-file checkov-results.json \
+            --soft-fail
+          echo "Checkov scan complete"
+
+      - name: Show Checkov findings summary
+        run: |
+          python3 -c "
+          import json
+          with open('checkov-results.json') as f:
+              data = json.load(f)
+
+          if isinstance(data, list):
+              data = data[0]
+
+          results = data.get('results', {})
+          failed = results.get('failed_checks', [])
+          passed = results.get('passed_checks', [])
+
+          print(f'=== CHECKOV RESULTS ===')
+          print(f'Passed checks: {len(passed)}')
+          print(f'Failed checks: {len(failed)}')
+          print()
+          print('--- Failed checks ---')
+          for check in failed:
+              print(f'  [FAIL] {check[\"check_id\"]} — {check[\"check_name\"]}')
+              print(f'         Resource: {check[\"resource\"]}')
+          "
 
       - name: Show Semgrep findings summary
         run: |
