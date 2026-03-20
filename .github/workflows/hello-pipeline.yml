@@ -43,6 +43,7 @@ jobs:
           base: ""
           head: HEAD
         continue-on-error: true
+
       - name: Install Checkov
         run: pip install checkov
 
@@ -50,8 +51,9 @@ jobs:
         run: |
           checkov \
             --directory terraform/ \
+            --output cli \
             --output json \
-            --output-file checkov-results.json \
+            --output-file-path checkov-output \
             --soft-fail
           echo "Checkov scan complete"
 
@@ -59,7 +61,19 @@ jobs:
         run: |
           python3 -c "
           import json
-          with open('checkov-results.json') as f:
+          import os
+
+          results_file = None
+          for f in os.listdir('checkov-output'):
+              if f.endswith('.json'):
+                  results_file = f'checkov-output/{f}'
+                  break
+
+          if not results_file:
+              print('No results file found')
+              exit(1)
+
+          with open(results_file) as f:
               data = json.load(f)
 
           if isinstance(data, list):
@@ -97,7 +111,6 @@ jobs:
                   line = finding['start']['line']
                   rule = finding['check_id'].split('.')[-1]
                   print(f'  [{sev}] {path}:{line} — {rule}')
-
           print(f'TOTAL SEMGREP FINDINGS: {total}')
           "
 
@@ -108,4 +121,4 @@ jobs:
           path: |
             semgrep-community.json
             semgrep-custom.json
-            checkov-results.json
+            checkov-output/
