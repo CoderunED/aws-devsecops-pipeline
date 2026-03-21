@@ -1,0 +1,8 @@
+# Mac system files
+.DS_Store
+
+# Generated scan artifacts (produced by CI, not source code)
+semgrep-community.json
+semgrep-custom.json
+checkov-output/
+ai-summary.md
