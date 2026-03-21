@@ -3,6 +3,7 @@ import json
 import os
 import sys
 
+
 def load_findings():
     all_findings = []
 
@@ -69,11 +70,10 @@ For each finding use this format:
 
 
 def call_claude(prompt):
-    client = anthropic.Anthropic(api_key=os.environ.get("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"))
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         print("Error: ANTHROPIC_API_KEY environment variable not set")
         sys.exit(1)
-
     client = anthropic.Anthropic(api_key=api_key)
 
     message = client.messages.create(
