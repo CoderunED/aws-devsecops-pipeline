@@ -15,8 +15,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Install Python dependencies
+        run: pip install semgrep checkov anthropic
 
       - name: Run Semgrep — community rules
         run: |
@@ -43,9 +43,6 @@ jobs:
           base: ""
           head: HEAD
         continue-on-error: true
-
-      - name: Install Checkov
-        run: pip install checkov
 
       - name: Run Checkov IaC scan
         run: |
@@ -86,11 +83,6 @@ jobs:
           print(f'=== CHECKOV RESULTS ===')
           print(f'Passed checks: {len(passed)}')
           print(f'Failed checks: {len(failed)}')
-          print()
-          print('--- Failed checks ---')
-          for check in failed:
-              print(f'  [FAIL] {check[\"check_id\"]} — {check[\"check_name\"]}')
-              print(f'         Resource: {check[\"resource\"]}')
           "
 
       - name: Show Semgrep findings summary
@@ -114,6 +106,11 @@ jobs:
           print(f'TOTAL SEMGREP FINDINGS: {total}')
           "
 
+      - name: Run AI security summarizer
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/ai_summarizer.py
+
       - name: Upload all results
         uses: actions/upload-artifact@v4
         with:
@@ -122,3 +119,4 @@ jobs:
             semgrep-community.json
             semgrep-custom.json
             checkov-output/
+            ai-summary.md
