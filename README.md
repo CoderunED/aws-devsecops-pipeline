@@ -48,13 +48,14 @@ Code Push → SAST Scan → Secret Scan → IaC Scan → AI Summary → Gate
 - Checkov — Terraform IaC misconfiguration scanning
 - Python — scripting and custom rule logic
 - AWS — target infrastructure
-- Claude API — AI-powered findings summary (coming Week 3)
+- Claude API — AI-powered security analysis (live)
 
 ## Current Status
 - [x] GitHub Actions pipeline running
 - [x] Semgrep SAST scanning (community + custom rules)
 - [x] Trufflehog secret scanning
 - [x] Checkov IaC scanning
+- [x] Claude AI security summarizer
 - [ ] AI-powered PR comments
 - [ ] Merge blocking on critical findings
 
@@ -67,5 +68,5 @@ Code Push → SAST Scan → Secret Scan → IaC Scan → AI Summary → Gate
 - Full scan completes in under 60 seconds
 
 ## What's Next
-Wiring in Claude AI to read every finding and post plain-English
-explanations with fix suggestions directly on pull requests.
+Posting AI summary automatically as pull request comments,
+then adding merge blocking on critical findings.
