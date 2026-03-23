@@ -114,6 +114,38 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python3 scripts/ai_summarizer.py
 
+      - name: Post AI summary as PR comment
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 -c "
+          import os
+          import json
+          import urllib.request
+
+          token = os.environ['GITHUB_TOKEN']
+          repo = os.environ['REPO']
+          pr_number = os.environ['PR_NUMBER']
+
+          with open('ai-summary.md') as f:
+              summary = f.read()
+
+          comment = f'## 🔒 Automated Security Scan Results\n\n{summary}\n\n---\n*Posted automatically by the DevSecOps pipeline*'
+
+          url = f'https://api.github.com/repos/{repo}/issues/{pr_number}/comments'
+          data = json.dumps({'body': comment}).encode()
+          req = urllib.request.Request(url, data=data, method='POST')
+          req.add_header('Authorization', f'Bearer {token}')
+          req.add_header('Content-Type', 'application/json')
+          req.add_header('Accept', 'application/vnd.github.v3+json')
+
+          with urllib.request.urlopen(req) as response:
+              print(f'Comment posted — status: {response.status}')
+          "
+
       - name: Upload all results
         uses: actions/upload-artifact@v4
         with:
