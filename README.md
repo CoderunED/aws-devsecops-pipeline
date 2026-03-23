@@ -56,7 +56,7 @@ Code Push → SAST Scan → Secret Scan → IaC Scan → AI Summary → Gate
 - [x] Trufflehog secret scanning
 - [x] Checkov IaC scanning
 - [x] Claude AI security summarizer
-- [ ] AI-powered PR comments
+- [x] AI-powered PR comments
 - [ ] Merge blocking on critical findings
 
 ## Metrics So Far
