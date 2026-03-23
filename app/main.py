@@ -29,3 +29,4 @@ def hash_password(pwd):
 # VULN 5: Hardcoded AWS key pattern
 AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 ```
+# test
