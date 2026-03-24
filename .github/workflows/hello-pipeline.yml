@@ -109,6 +109,9 @@ jobs:
           print(f'TOTAL SEMGREP FINDINGS: {total}')
           "
 
+      - name: Security gate — block on critical findings
+        run: python3 scripts/check_findings.py
+
       - name: Run AI security summarizer
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
