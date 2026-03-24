@@ -29,6 +29,12 @@ explanations with before/after code fixes directly on pull requests.
 
 ![AI comment showing findings 6 and 7](https://github.com/user-attachments/assets/c0545d7f-fb0f-4f92-8988-6c9ac8891381)
 
+### Security Gate Blocking a PR
+When critical vulnerabilities are detected the pipeline fails automatically
+and the PR cannot be merged until issues are resolved.
+
+![Security gate blocking PR with critical findings](https://github.com/user-attachments/assets/2e379f4c-1bd6-4306-8559-5e42c8251e9a)
+
 ## Security Tools
 
 | Tool | Purpose | Rules Run | Findings (demo) |
@@ -96,3 +102,4 @@ explanations with before/after code fixes directly on pull requests.
   vulnerabilities and 26 infrastructure misconfigurations caught
   automatically, by building custom Semgrep rules and Checkov IaC scanning
   across Python code, git history, and Terraform infrastructure.
+README
