@@ -30,3 +30,4 @@ def hash_password(pwd):
 AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 ```
 # test
+# security gate test
